@@ -1,53 +1,112 @@
-import { BookOpenText } from 'lucide-react';
-import { DashboardShell } from '@/components/dashboard-shell';
-import { teacherAssignments, teacherSchedule } from '@/lib/portal-data';
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
-export default function TeachersPage() {
-  return (
-    <DashboardShell title="Teacher Portal">
-      <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="rounded-3xl bg-white p-6 shadow-soft">
-          <div className="mb-5 flex items-center gap-3">
-            <div className="rounded-xl bg-brand-100 p-3 text-brand-700">
-              <BookOpenText className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-sm uppercase tracking-[0.2em] text-slate-500">Teaching schedule</p>
-              <h2 className="text-2xl font-bold text-slate-900">Class agenda</h2>
-            </div>
-          </div>
+export async function POST() {
+  try {
+    const userCount = await prisma.user.count();
 
-          <div className="space-y-4">
-            {teacherAssignments.map((assignment) => (
-              <div key={assignment.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <h3 className="text-lg font-semibold text-slate-900">{assignment.teacher}</h3>
-                    <p className="text-sm text-slate-500">{assignment.subject} · {assignment.class}</p>
-                  </div>
-                  <span className="rounded-full bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700">
-                    {assignment.status}
-                  </span>
-                </div>
-                <p className="mt-3 text-sm text-slate-700">{assignment.agenda}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+    if (userCount > 0) {
+      return NextResponse.json({ ok: true, message: 'Database already seeded.' });
+    }
 
-        <div className="rounded-3xl bg-white p-6 shadow-soft">
-          <h3 className="text-xl font-bold text-slate-900">Today&apos;s timetable</h3>
-          <div className="mt-4 space-y-3">
-            {teacherSchedule.map((slot) => (
-              <div key={`${slot.day}-${slot.time}`} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <p className="text-sm font-semibold text-slate-900">{slot.subject}</p>
-                <p className="mt-1 text-sm text-slate-600">{slot.day} · {slot.time}</p>
-                <p className="mt-1 text-sm text-slate-500">{slot.room}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </DashboardShell>
-  );
+    const adminUser = await prisma.user.create({
+      data: {
+        name: 'Alicia Mukami',
+        email: 'admin@northview.edu',
+        password: 'password123',
+        role: 'ADMIN',
+      },
+    });
+
+    const teacherUser = await prisma.user.create({
+      data: {
+        name: 'Daniel Moyo',
+        email: 'teacher@northview.edu',
+        password: 'password123',
+        role: 'TEACHER',
+      },
+    });
+
+    const studentUser = await prisma.user.create({
+      data: {
+        name: 'Mia Njeri',
+        email: 'student@northview.edu',
+        password: 'password123',
+        role: 'STUDENT',
+      },
+    });
+
+    const parentUser = await prisma.user.create({
+      data: {
+        name: 'Grace Njeri',
+        email: 'parent@northview.edu',
+        password: 'password123',
+        role: 'PARENT',
+      },
+    });
+
+    const accountantUser = await prisma.user.create({
+      data: {
+        name: 'James Kariuki',
+        email: 'accountant@northview.edu',
+        password: 'password123',
+        role: 'ACCOUNTANT',
+      },
+    });
+
+    await prisma.teacher.create({
+      data: {
+        userId: teacherUser.id,
+        employeeId: 'EMP-1001',
+        department: 'Mathematics',
+      },
+    });
+
+    await prisma.student.create({
+      data: {
+        userId: studentUser.id,
+        admissionNumber: 'STU-1001',
+        gradeLevel: 'Grade 10',
+        guardianName: parentUser.name,
+        guardianEmail: parentUser.email,
+      },
+    });
+
+    await prisma.parent.create({
+      data: {
+        userId: parentUser.id,
+        relationship: 'Mother',
+      },
+    });
+
+    await prisma.accountant.create({
+      data: {
+        userId: accountantUser.id,
+        employeeId: 'ACC-1001',
+        department: 'Finance',
+      },
+    });
+
+    await prisma.announcement.create({
+      data: {
+        title: 'Welcome to the new term',
+        content: 'All students should complete registration before Friday.',
+        createdById: adminUser.id,
+      },
+    });
+
+    return NextResponse.json({ ok: true, message: 'Seed completed successfully.' });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: error instanceof Error ? error.message : 'Unknown error while seeding',
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET() {
+  return NextResponse.json({ ok: true, message: 'Use POST to seed the database.' });
 }

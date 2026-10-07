@@ -1,43 +1,59 @@
-import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 
-export async function GET() {
-  return NextResponse.json({ message: 'Method not allowed.' }, { status: 405 });
-}
+export type PortalUserRole = 'admin' | 'teacher' | 'student' | 'parent' | 'accountant';
 
-export async function POST(request: Request) {
-  const { email, password } = await request.json();
+export type PortalSession = {
+  email: string;
+  name: string;
+  role: PortalUserRole;
+};
 
-  const validUsers = {
-    'admin@northview.edu': { name: 'Alicia Mukami', role: 'admin', password: 'password123' },
-    'teacher@northview.edu': { name: 'Daniel Moyo', role: 'teacher', password: 'password123' },
-    'student@northview.edu': { name: 'Mia Njeri', role: 'student', password: 'password123' },
-    'parent@northview.edu': { name: 'Grace Njeri', role: 'parent', password: 'password123' },
-  } as const;
+export const demoUsers: Record<
+  string,
+  { name: string; role: PortalUserRole; password: string }
+> = {
+  'admin@northview.edu': {
+    name: 'Alicia Mukami',
+    role: 'admin',
+    password: 'password123',
+  },
+  'teacher@northview.edu': {
+    name: 'Daniel Moyo',
+    role: 'teacher',
+    password: 'password123',
+  },
+  'student@northview.edu': {
+    name: 'Mia Njeri',
+    role: 'student',
+    password: 'password123',
+  },
+  'parent@northview.edu': {
+    name: 'Grace Njeri',
+    role: 'parent',
+    password: 'password123',
+  },
+  'accountant@northview.edu': {
+    name: 'James Kariuki',
+    role: 'accountant',
+    password: 'password123',
+  },
+};
 
-  const user = validUsers[email as keyof typeof validUsers];
+export function getSession(): PortalSession | null {
+  const cookieStore = cookies();
+  const raw = cookieStore.get('school_portal_session')?.value;
 
-  if (!user || user.password !== password) {
-    return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 });
+  if (!raw) {
+    return null;
   }
 
-  const session = {
-    email,
-    name: user.name,
-    role: user.role,
-  };
+  try {
+    return JSON.parse(raw) as PortalSession;
+  } catch {
+    return null;
+  }
+}
 
-  const response = NextResponse.json({
-    ok: true,
-    redirectTo: user.role === 'admin' ? '/admin' : user.role === 'teacher' ? '/teachers' : '/dashboard',
-  });
-
-  response.cookies.set('school_portal_session', JSON.stringify(session), {
-    httpOnly: true,
-    path: '/',
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 60 * 60 * 8,
-  });
-
-  return response;
+export function isAllowed(session: PortalSession | null, roles: PortalUserRole[]) {
+  return !!session && roles.includes(session.role);
 }
