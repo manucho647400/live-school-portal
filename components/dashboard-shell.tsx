@@ -1,13 +1,14 @@
 import Link from 'next/link';
-import { BookOpen, CalendarClock, GraduationCap, ShieldCheck, Users } from 'lucide-react';
+import { BookOpen, CalendarClock, DollarSign, GraduationCap, LogOut, Megaphone, ShieldCheck, Users } from 'lucide-react';
 
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: GraduationCap },
-  { label: 'Student', href: '/student', icon: Users },
-  { label: 'Parent', href: '/parent', icon: ShieldCheck },
-  { label: 'Teacher', href: '/teachers', icon: BookOpen },
   { label: 'Admin', href: '/admin', icon: ShieldCheck },
-  { label: 'Announcements', href: '/announcements', icon: CalendarClock },
+  { label: 'Accountant', href: '/accountant', icon: DollarSign },
+  { label: 'Teacher', href: '/teachers', icon: BookOpen },
+  { label: 'Announcements', href: '/announcements', icon: Megaphone },
+  { label: 'Attendance', href: '/attendance', icon: CalendarClock },
+  { label: 'Students', href: '/students', icon: Users },
 ];
 
 export function DashboardShell({ title, children }: { title: string; children: React.ReactNode }) {
@@ -28,6 +29,17 @@ export function DashboardShell({ title, children }: { title: string; children: R
                   {label}
                 </Link>
               ))}
+              <button
+                type="button"
+                onClick={async () => {
+                  await fetch('/api/auth/logout', { method: 'POST' });
+                  window.location.href = '/login';
+                }}
+                className="inline-flex items-center gap-2 rounded-full bg-slate-950/20 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-950/30"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
             </div>
           </div>
         </header>
