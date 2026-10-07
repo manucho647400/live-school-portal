@@ -1,14 +1,14 @@
 import Link from 'next/link';
-import { BookOpen, CalendarClock, DollarSign, GraduationCap, LogOut, Megaphone, ShieldCheck, Users } from 'lucide-react';
+import { AlertCircle, BarChart3, BookOpen, DollarSign, GraduationCap, LogOut, ShieldCheck, Users } from 'lucide-react';
 
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: GraduationCap },
   { label: 'Admin', href: '/admin', icon: ShieldCheck },
   { label: 'Accountant', href: '/accountant', icon: DollarSign },
+  { label: 'Finance', href: '/finance', icon: BarChart3 },
   { label: 'Teacher', href: '/teachers', icon: BookOpen },
-  { label: 'Announcements', href: '/announcements', icon: Megaphone },
-  { label: 'Attendance', href: '/attendance', icon: CalendarClock },
   { label: 'Students', href: '/students', icon: Users },
+  { label: 'Alerts', href: '/accountant', icon: AlertCircle },
 ];
 
 export function DashboardShell({ title, children }: { title: string; children: React.ReactNode }) {
