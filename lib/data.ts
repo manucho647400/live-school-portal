@@ -1,41 +1,49 @@
-export const mockAnnouncements = [
-  {
-    id: 'a1',
-    title: 'Science Fair Registration Open',
-    description: 'Students in grades 7-12 can register before Friday.',
-    date: 'Today',
-  },
-  {
-    id: 'a2',
-    title: 'Parent-Teacher Conference',
-    description: 'Conference slots are now available for booking online.',
-    date: 'Tomorrow',
-  },
-  {
-    id: 'a3',
-    title: 'Inter-school Debate Finals',
-    description: 'The finals are scheduled for next Thursday at 10:00 AM.',
-    date: 'This Week',
-  },
+import Link from 'next/link';
+import { BookOpen, CalendarClock, GraduationCap, LogOut, Megaphone, Users } from 'lucide-react';
+
+const navItems = [
+  { label: 'Dashboard', href: '/dashboard', icon: GraduationCap },
+  { label: 'Announcements', href: '/announcements', icon: Megaphone },
+  { label: 'Attendance', href: '/attendance', icon: CalendarClock },
+  { label: 'Students', href: '/students', icon: Users },
+  { label: 'Classes', href: '/dashboard', icon: BookOpen },
 ];
 
-export const dashboardStats = [
-  { label: 'Total Students', value: '1,248', trend: '+8.2%' },
-  { label: 'Teachers', value: '96', trend: '+3.4%' },
-  { label: 'Attendance Rate', value: '94.8%', trend: '+1.1%' },
-  { label: 'Assignments Due', value: '42', trend: '-6.2%' },
-];
+export function DashboardShell({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <main className="min-h-screen bg-slate-100 text-slate-900">
+      <div className="mx-auto max-w-7xl px-4 py-6 md:px-8">
+        <header className="mb-6 rounded-3xl bg-gradient-to-r from-brand-700 to-brand-500 p-6 text-white shadow-soft">
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm uppercase tracking-[0.2em] text-brand-100">Northview Academy</p>
+              <h1 className="mt-2 text-3xl font-bold">{title}</h1>
+            </div>
 
-export const assignmentData = [
-  { title: 'Algebra Quiz', subject: 'Mathematics', due: 'Tue, 9:00 AM' },
-  { title: 'Lab Report', subject: 'Science', due: 'Wed, 2:00 PM' },
-  { title: 'Essay Draft', subject: 'English', due: 'Thu, 5:00 PM' },
-  { title: 'History Presentation', subject: 'Social Studies', due: 'Fri, 10:30 AM' },
-];
+            <div className="flex flex-wrap items-center gap-3">
+              {navItems.map(({ label, href, icon: Icon }) => (
+                <Link
+                  key={label}
+                  href={href}
+                  className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/20"
+                >
+                  <Icon className="h-4 w-4" />
+                  {label}
+                </Link>
+              ))}
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-2 rounded-full bg-slate-950/20 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-950/30"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </Link>
+            </div>
+          </div>
+        </header>
 
-export const gradeData = [
-  { subject: 'Mathematics', score: 92, grade: 'A' },
-  { subject: 'Science', score: 88, grade: 'A-' },
-  { subject: 'English', score: 95, grade: 'A' },
-  { subject: 'History', score: 84, grade: 'B+' },
-];
+        {children}
+      </div>
+    </main>
+  );
+}
