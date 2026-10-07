@@ -1,7 +1,45 @@
+'use client';
+
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { FormEvent, useState } from 'react';
 import { ArrowLeft, Eye, LockKeyhole, UserCircle2 } from 'lucide-react';
 
 export default function LoginPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState('admin@northview.edu');
+  const [password, setPassword] = useState('password123');
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Unable to sign in.');
+        return;
+      }
+
+      router.push(data.redirectTo || '/dashboard');
+      router.refresh();
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-100 px-4 py-12">
       <div className="w-full max-w-5xl overflow-hidden rounded-3xl bg-white shadow-soft">
@@ -27,7 +65,7 @@ export default function LoginPage() {
               <h2 className="mt-2 text-3xl font-bold text-slate-900">School portal</h2>
             </div>
 
-            <form className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label htmlFor="email" className="mb-2 block text-sm font-medium text-slate-700">
                   Email address
@@ -37,7 +75,8 @@ export default function LoginPage() {
                   <input
                     id="email"
                     type="email"
-                    defaultValue="admin@northview.edu"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
                     className="w-full border-none bg-transparent text-slate-900 outline-none placeholder:text-slate-400"
                     placeholder="you@school.edu"
                   />
@@ -53,7 +92,8 @@ export default function LoginPage() {
                   <input
                     id="password"
                     type="password"
-                    defaultValue="password123"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
                     className="w-full border-none bg-transparent text-slate-900 outline-none placeholder:text-slate-400"
                     placeholder="Enter your password"
                   />
@@ -70,13 +110,20 @@ export default function LoginPage() {
                 </Link>
               </div>
 
-              <Link
-                href="/dashboard"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 px-4 py-3 font-semibold text-white transition hover:bg-brand-500"
+              {error ? (
+                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {error}
+                </div>
+              ) : null}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 px-4 py-3 font-semibold text-white transition hover:bg-brand-500 disabled:cursor-not-allowed disabled:opacity-70"
               >
                 <Eye className="h-4 w-4" />
-                Sign in to dashboard
-              </Link>
+                {loading ? 'Signing in...' : 'Sign in to dashboard'}
+              </button>
             </form>
           </div>
         </div>
