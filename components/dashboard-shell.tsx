@@ -1,11 +1,14 @@
 import Link from 'next/link';
-import { AlertCircle, BarChart3, BookOpen, DollarSign, GraduationCap, LogOut, ShieldCheck, Users } from 'lucide-react';
+import { AlertCircle, BarChart3, BookOpen, DollarSign, FileText, GraduationCap, LogOut, ShieldCheck, Users, WalletCards } from 'lucide-react';
 
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: GraduationCap },
   { label: 'Admin', href: '/admin', icon: ShieldCheck },
   { label: 'Accountant', href: '/accountant', icon: DollarSign },
   { label: 'Finance', href: '/finance', icon: BarChart3 },
+  { label: 'Payroll', href: '/payroll', icon: WalletCards },
+  { label: 'Invoices', href: '/invoices', icon: FileText },
+  { label: 'Reports', href: '/reports', icon: BarChart3 },
   { label: 'Teacher', href: '/teachers', icon: BookOpen },
   { label: 'Students', href: '/students', icon: Users },
   { label: 'Alerts', href: '/accountant', icon: AlertCircle },
